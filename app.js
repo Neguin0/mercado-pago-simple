@@ -24,7 +24,7 @@ async function createPayment(product) {
 			identification: {
 				type: "phone",
 				number: product.phone,
-			}
+			},
 		}
 	};
 	return mercadopago.payment.create(payment_data)
@@ -57,7 +57,7 @@ async function createPayment(product) {
  */
 
 async function getPayment(id) {
-	mercadopago.payment.get(id)
+	return mercadopago.payment.get(id)
 		.then((data) => {
 			const response = data?.response;
 			const result = {
@@ -66,10 +66,15 @@ async function getPayment(id) {
 				price: response?.transaction_amount,
 				name_collector: response?.point_of_interaction?.transaction_data?.bank_info?.collector?.account_holder_name,
 				qr_code: response?.point_of_interaction?.transaction_data?.qr_code,
-				payerId: response?.payer?.id,
 				date_created: response?.date_created,
 				date_expiration: response?.date_of_expiration,
 				qr_code_base64: response?.point_of_interaction?.transaction_data?.qr_code_base64,
+				payer: {
+					id: response?.payer?.id,
+					email: response?.payer?.email,
+					number: response?.payer?.identification?.number,
+					type: response?.payer?.identification?.type,
+				}
 			}
 			return result;
 		})
